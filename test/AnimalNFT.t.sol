@@ -21,13 +21,7 @@ contract AnimalNFTTest is Test {
 
     function testAnimalAttributes() public view {
         // Vérifie les attributs de l'animal #1
-        (
-            string memory name,
-            uint256 wings,
-            uint256 legs,
-            uint256 sex,
-            bool canFly
-        ) = animalNFT.animals(1);
+        (string memory name, uint256 wings, uint256 legs, uint256 sex, bool canFly) = animalNFT.animals(1);
         assertEq(name, "Genesis Animal");
         assertEq(wings, 2);
         assertEq(legs, 4);
@@ -57,13 +51,7 @@ contract AnimalNFTTest is Test {
         assertEq(tokenId, 2);
         assertEq(animalNFT.ownerOf(2), address(0x123));
 
-        (
-            string memory name,
-            uint256 wings,
-            uint256 legs,
-            uint256 sex,
-            bool canFly
-        ) = animalNFT.animals(2);
+        (string memory name, uint256 wings, uint256 legs, uint256 sex, bool canFly) = animalNFT.animals(2);
         assertEq(name, "Dragon");
         assertEq(wings, 4);
         assertEq(legs, 2);

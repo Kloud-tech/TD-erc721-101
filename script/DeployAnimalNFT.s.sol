@@ -19,11 +19,7 @@ contract DeployAnimalNFT is Script {
         console.log("AnimalNFT deployed at:", address(animalNFT));
 
         // Transfère le token #1 à l'Evaluator
-        animalNFT.transferFrom(
-            vm.addr(deployerPrivateKey),
-            evaluatorAddress,
-            1
-        );
+        animalNFT.transferFrom(vm.addr(deployerPrivateKey), evaluatorAddress, 1);
         console.log("Token #1 transferred to Evaluator at:", evaluatorAddress);
 
         vm.stopBroadcast();

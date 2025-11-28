@@ -14,9 +14,7 @@ interface IEvaluator {
     function ex5_declareDeadAnimal() external;
     function ex6a_auctionAnimal_offer() external;
     function ex6b_auctionAnimal_buy(uint256 animalForSale) external;
-    function readName(
-        address studentAddress
-    ) external view returns (string memory);
+    function readName(address studentAddress) external view returns (string memory);
     function readLegs(address studentAddress) external view returns (uint256);
     function readSex(address studentAddress) external view returns (uint256);
     function readWings(address studentAddress) external view returns (bool);
@@ -81,14 +79,7 @@ contract ValidateExercises is Script {
         // sex -> sex
 
         uint256 wingsUint = wings ? 1 : 0; // Just in case we want to store it in the uint field too
-        uint256 newTokenId = animalNFT.mintAnimal(
-            deployerAddress,
-            name,
-            wingsUint,
-            legs,
-            sex,
-            wings
-        );
+        uint256 newTokenId = animalNFT.mintAnimal(deployerAddress, name, wingsUint, legs, sex, wings);
         console.log("Minted animal with ID:", newTokenId);
 
         // 7. Give the animal to Evaluator
@@ -102,7 +93,7 @@ contract ValidateExercises is Script {
         // --- Exercise 3: Register Breeder ---
         console.log("Validating Ex 3...");
         // Ensure Evaluator has ETH to register
-        (bool success, ) = evaluatorAddress.call{value: 0.01 ether}("");
+        (bool success,) = evaluatorAddress.call{value: 0.01 ether}("");
         require(success, "Failed to fund Evaluator");
         evaluator.ex3_testRegisterBreeder();
         console.log("Ex 3 validated");
@@ -125,14 +116,7 @@ contract ValidateExercises is Script {
         // --- Exercise 6b: Auction Buy ---
         console.log("Validating Ex 6b...");
         // Mint a new animal to sell to Evaluator
-        uint256 animalForSaleId = animalNFT.mintAnimal(
-            deployerAddress,
-            "Sale Animal",
-            0,
-            4,
-            1,
-            false
-        );
+        uint256 animalForSaleId = animalNFT.mintAnimal(deployerAddress, "Sale Animal", 0, 4, 1, false);
         console.log("Minted animal for sale with ID:", animalForSaleId);
 
         // Offer it for sale

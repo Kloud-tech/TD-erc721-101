@@ -6,14 +6,10 @@ import "../src/AnimalNFT.sol";
 
 interface IEvaluator2 {
     function submitExercice(address studentExercice) external;
-    function ex7a_breedAnimalWithParents(uint parent1, uint parent2) external;
+    function ex7a_breedAnimalWithParents(uint256 parent1, uint256 parent2) external;
     function ex7b_offerAnimalForReproduction() external;
-    function ex7c_payForReproduction(
-        uint animalAvailableForReproduction
-    ) external;
-    function readName(
-        address studentAddress
-    ) external view returns (string memory);
+    function ex7c_payForReproduction(uint256 animalAvailableForReproduction) external;
+    function readName(address studentAddress) external view returns (string memory);
     function readLegs(address studentAddress) external view returns (uint256);
     function readSex(address studentAddress) external view returns (uint256);
     function readWings(address studentAddress) external view returns (bool);
@@ -61,17 +57,8 @@ contract ValidateAdvancedExercises is Script {
 
         // Evaluator needs to own an animal to offer it for reproduction.
         // We can mint one and give it to Evaluator.
-        uint256 evaluatorAnimal = animalNFT.declareAnimal(
-            0,
-            4,
-            false,
-            "Evaluator Animal"
-        );
-        animalNFT.transferFrom(
-            deployerAddress,
-            evaluator2Address,
-            evaluatorAnimal
-        );
+        uint256 evaluatorAnimal = animalNFT.declareAnimal(0, 4, false, "Evaluator Animal");
+        animalNFT.transferFrom(deployerAddress, evaluator2Address, evaluatorAnimal);
 
         evaluator.ex7b_offerAnimalForReproduction();
         console.log("Ex 7b validated");
@@ -81,18 +68,13 @@ contract ValidateAdvancedExercises is Script {
 
         // We need an animal available for reproduction that does NOT belong to Evaluator.
         // Mint a new one for this purpose.
-        uint256 reproductionAnimal = animalNFT.declareAnimal(
-            0,
-            4,
-            false,
-            "Stud"
-        );
+        uint256 reproductionAnimal = animalNFT.declareAnimal(0, 4, false, "Stud");
         uint256 reproductionPrice = 0.0001 ether;
 
         animalNFT.offerForReproduction(reproductionAnimal, reproductionPrice);
 
         // Ensure Evaluator has funds to pay
-        (bool success, ) = evaluator2Address.call{value: 0.01 ether}("");
+        (bool success,) = evaluator2Address.call{value: 0.01 ether}("");
         require(success, "Failed to fund Evaluator");
 
         evaluator.ex7c_payForReproduction(reproductionAnimal);

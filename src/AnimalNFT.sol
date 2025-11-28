@@ -33,34 +33,19 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
         _mint(msg.sender, _tokenIdCounter);
 
         // Set default animal attributes for token #1
-        animals[_tokenIdCounter] = Animal({
-            name: "Genesis Animal",
-            wings: 2,
-            legs: 4,
-            sex: 0,
-            canFly: true
-        });
+        animals[_tokenIdCounter] = Animal({name: "Genesis Animal", wings: 2, legs: 4, sex: 0, canFly: true});
     }
 
-    function mintAnimal(
-        address to,
-        string memory name,
-        uint256 wings,
-        uint256 legs,
-        uint256 sex,
-        bool canFly
-    ) public onlyOwner returns (uint256) {
+    function mintAnimal(address to, string memory name, uint256 wings, uint256 legs, uint256 sex, bool canFly)
+        public
+        onlyOwner
+        returns (uint256)
+    {
         _tokenIdCounter++;
         uint256 newTokenId = _tokenIdCounter;
 
         _mint(to, newTokenId);
-        animals[newTokenId] = Animal({
-            name: name,
-            wings: wings,
-            legs: legs,
-            sex: sex,
-            canFly: canFly
-        });
+        animals[newTokenId] = Animal({name: name, wings: wings, legs: legs, sex: sex, canFly: canFly});
 
         return newTokenId;
     }
@@ -68,10 +53,7 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
     // Breeding and Access Control
 
     function registerMeAsBreeder() external payable {
-        require(
-            msg.value >= REGISTRATION_PRICE,
-            "Insufficient registration fee"
-        );
+        require(msg.value >= REGISTRATION_PRICE, "Insufficient registration fee");
         breeders[msg.sender] = true;
     }
 
@@ -83,12 +65,7 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
         return REGISTRATION_PRICE;
     }
 
-    function declareAnimal(
-        uint sex,
-        uint legs,
-        bool wings,
-        string calldata name
-    ) external returns (uint256) {
+    function declareAnimal(uint256 sex, uint256 legs, bool wings, string calldata name) external returns (uint256) {
         require(breeders[msg.sender], "Not a registered breeder");
 
         _tokenIdCounter++;
@@ -107,12 +84,12 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
     }
 
     function declareAnimalWithParents(
-        uint sex,
-        uint legs,
+        uint256 sex,
+        uint256 legs,
         bool wings,
         string calldata name,
-        uint parent1,
-        uint parent2
+        uint256 parent1,
+        uint256 parent2
     ) external returns (uint256) {
         // require(breeders[msg.sender], "Not a registered breeder"); // Removed for Evaluator2 compatibility
         require(ownerOf(parent1) != address(0), "Parent 1 does not exist");
@@ -120,10 +97,7 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
 
         // Check authorization for reproduction
         if (ownerOf(parent2) != msg.sender) {
-            require(
-                authorizedBreeders[parent2] == msg.sender,
-                "Not authorized to breed with parent 2"
-            );
+            require(authorizedBreeders[parent2] == msg.sender, "Not authorized to breed with parent 2");
             // Reset authorization after use
             delete authorizedBreeders[parent2];
         }
@@ -132,22 +106,14 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
         uint256 newTokenId = _tokenIdCounter;
 
         _mint(msg.sender, newTokenId);
-        animals[newTokenId] = Animal({
-            name: name,
-            wings: wings ? 1 : 0,
-            legs: legs,
-            sex: sex,
-            canFly: wings
-        });
+        animals[newTokenId] = Animal({name: name, wings: wings ? 1 : 0, legs: legs, sex: sex, canFly: wings});
 
         parents[newTokenId] = [parent1, parent2];
 
         return newTokenId;
     }
 
-    function getParents(
-        uint256 animalNumber
-    ) external view returns (uint256, uint256) {
+    function getParents(uint256 animalNumber) external view returns (uint256, uint256) {
         require(ownerOf(animalNumber) != address(0), "Animal does not exist");
         return (parents[animalNumber][0], parents[animalNumber][1]);
     }
@@ -179,7 +145,7 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
         address seller = ownerOf(animalNumber);
 
         // Transfer funds to seller
-        (bool success, ) = payable(seller).call{value: msg.value}("");
+        (bool success,) = payable(seller).call{value: msg.value}("");
         require(success, "Transfer failed");
 
         // Transfer ownership
@@ -199,27 +165,20 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
         return prices[animalNumber];
     }
 
-    function isAnimalForSale(
-        uint256 animalNumber
-    ) external view returns (bool) {
+    function isAnimalForSale(uint256 animalNumber) external view returns (bool) {
         return forSale[animalNumber];
     }
 
     // Reproduction Marketplace
 
-    function offerForReproduction(
-        uint256 animalNumber,
-        uint256 price
-    ) external returns (uint256) {
+    function offerForReproduction(uint256 animalNumber, uint256 price) external returns (uint256) {
         require(ownerOf(animalNumber) == msg.sender, "Not the owner");
         reproductionPrices[animalNumber] = price;
         reproductionForSale[animalNumber] = true;
         return animalNumber;
     }
 
-    function reproductionPrice(
-        uint256 animalNumber
-    ) external view returns (uint256) {
+    function reproductionPrice(uint256 animalNumber) external view returns (uint256) {
         return reproductionPrices[animalNumber];
     }
 
@@ -228,33 +187,23 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
     }
 
     function payForReproduction(uint256 animalNumber) external payable {
-        require(
-            reproductionForSale[animalNumber],
-            "Animal not for reproduction"
-        );
-        require(
-            msg.value >= reproductionPrices[animalNumber],
-            "Insufficient funds"
-        );
+        require(reproductionForSale[animalNumber], "Animal not for reproduction");
+        require(msg.value >= reproductionPrices[animalNumber], "Insufficient funds");
 
         address owner = ownerOf(animalNumber);
 
         // Transfer funds to owner
-        (bool success, ) = payable(owner).call{value: msg.value}("");
+        (bool success,) = payable(owner).call{value: msg.value}("");
         require(success, "Transfer failed");
 
         authorizedBreeders[animalNumber] = msg.sender;
     }
 
-    function authorizedBreederToReproduce(
-        uint256 animalNumber
-    ) external view returns (address) {
+    function authorizedBreederToReproduce(uint256 animalNumber) external view returns (address) {
         return authorizedBreeders[animalNumber];
     }
 
-    function getAnimalCharacteristics(
-        uint256 tokenId
-    )
+    function getAnimalCharacteristics(uint256 tokenId)
         external
         view
         returns (string memory name, bool wings, uint256 legs, uint256 sex)
@@ -266,24 +215,19 @@ contract AnimalNFT is ERC721, ERC721Enumerable, Ownable {
 
     // The following functions are overrides required by Solidity.
 
-    function _update(
-        address to,
-        uint256 tokenId,
-        address auth
-    ) internal override(ERC721, ERC721Enumerable) returns (address) {
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721, ERC721Enumerable)
+        returns (address)
+    {
         return super._update(to, tokenId, auth);
     }
 
-    function _increaseBalance(
-        address account,
-        uint128 value
-    ) internal override(ERC721, ERC721Enumerable) {
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
         super._increaseBalance(account, value);
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
